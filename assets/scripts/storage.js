@@ -20,6 +20,8 @@ let engine_storage = [
     block_material:'Cast Aluminium',
     cylinder_head_material:'Cast Aluminium',
     intake_manifold:'Composite',
-    upgrade_stage:''
+    //Upgrades
+    upgrade_stage:'',
+    dyno:false,
     },
 ]

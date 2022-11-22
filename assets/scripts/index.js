@@ -68,10 +68,9 @@ confirm_btn.addEventListener('click',()=>{
                 startGame(engineIndex);
             })
         })})
-let firstTurboUpgrade = false;
-let dynoTStage1 = false;
-function startGame(SelEngineIndex){
+function startGame(SelEngineIndex,upgradeFailure){
     let temp = document.createElement("div");
+    clearDiv(engine_area);
     moddedEngine = engine_storage[SelEngineIndex];
     temp.innerHTML = `
     <img src=assets/images/generic_engine.jpg width=250 height=250>
@@ -80,38 +79,108 @@ function startGame(SelEngineIndex){
     <h2>Displacement:${moddedEngine.displacement}<h2>
     <input type=search id=upgrade_turbo list=turbo_options></input>
     <datalist id=turbo_options>
-        <option value="Stage 1">Install</option>
-        <option value="Stage 2">Install</option>
+        <option value="Stage 1">Install (80% Success)</option>
+        <option value="Stage 2">Install (40% Success)</option>
+        <option value="Stage 3">Install (20% Success)</option>
+        <option value="Stage 4">Install (10% Success)</option>
     </datalist>
     <button id=dyno_btn>Dyno!</button>
+    <button id=remove_dyno>Remove Dyno</button>
     `
     engine_area.appendChild(temp);
     document.getElementById("upgrade_turbo").addEventListener("change",()=>{
-        turboUpgrade(engineIndex)
+    let upgrade_turboBtn = document.getElementById("upgrade_turbo");
+    console.log(upgrade_turboBtn.value)
+    if(upgrade_turboBtn.value=='Stage 1'){
+        upgrade('turboSTG1');}
+    else if(upgrade_turboBtn.value=='Stage 2'){
+        upgrade('turboSTG2')
+    }
+    else if(upgrade_turboBtn.value=='Stage 3'){
+        upgrade('turboSTG3')
+    }
     })
     document.getElementById("dyno_btn").addEventListener("click",()=>{
         dynoTStage1=true;
-        turboUpgrade(engineIndex);
+        upgrade('dyno');
     })
+    document.getElementById("remove_dyno").addEventListener("click",()=>{removeUpgrades('dyno')})
 }
+
 let SelfIndex = engineIndex
-function turboUpgrade(){
 
-console.warn('TURBO UPGRADE')
+function upgrade(upgradeType){
+//Success rate for upgrades
+let successRate = Math.floor(Math.random()*11)
+console.warn(successRate);
+console.log(`UPGRADING ${upgradeType}`)
+    
+if(upgradeType=='turboSTG1'){
+console.log('TURBO STAGE 1 UPGRADE')
+    if(successRate>2){
+        console.log('Upgrade Success!')
+        if(moddedEngine.upgrade_stage!=''){
+            moddedEngine.horsepower=moddedEngine.horsepower;
+        }
+        else{
+        moddedEngine.horsepower=moddedEngine.horsepower+70;
+        moddedEngine.upgrade_stage='Stage 1 Turbo'
+        }}
+        else if(successRate==2||successRate==1){
+            console.warn('Upgrade Failed!')
+        }}
 
-firstTurboUpgrade = true;
 
-if(dynoTStage1==false){
-    moddedEngine.horsepower=moddedEngine.horsepower+70;
-}else{
-    moddedEngine.horsepower=moddedEngine.horsepower+150;
-}
+if(upgradeType=='turboSTG2'){
+    console.log('TURBO STAGE 2 UPGRADE');
+        if(successRate>=4){
+            console.log('Upgrade Success!')
+            if(moddedEngine.upgrade_stage!=''){
+                moddedEngine.horsepower=moddedEngine.horsepower;}
 
-console.log(`SELF INDEX:${SelfIndex}`)
+            else{
+                moddedEngine.horsepower=moddedEngine.horsepower+150;
+                moddedEngine.upgrade_stage='Stage 2 Turbo'
+            }}
 
-clearDiv(engine_area)
+            else if(successRate<3){
+                console.warn('Upgrade Failed!')
+                }}
 
-startGame(SelfIndex);
+if(upgradeType=='turboSTG3'){
+    console.log('TURBO STAGE 3 UPGRADE');
+    if(successRate<=7){
+        console.warn('Upgrade Failed!')}
+
+    else if(successRate>=8){
+            console.log('Upgrade Success!')
+            if(moddedEngine.upgrade_stage!=''){
+                moddedEngine.horsepower=moddedEngine.horsepower;}
+                
+            else{
+                moddedEngine.horsepower=moddedEngine.horsepower+450;
+                moddedEngine.upgrade_stage='Stage 3 Turbo'}}
+                
+                }
+
+else if(upgradeType=='dyno'){
+        if(moddedEngine.dyno==false){
+                moddedEngine.horsepower=moddedEngine.horsepower+150;
+                moddedEngine.dyno=true;}
+        }
+    
+    clearDiv(engine_area)
+    
+    startGame(SelfIndex);
+    }
+
+function removeUpgrades(upgradeType){
+    console.log(`REMOVING ${upgradeType} UPGRADE`)
+    if(upgradeType=='dyno'){
+        moddedEngine.dyno=false;
+        moddedEngine.horsepower=moddedEngine.horsepower-150;
+    }
+    startGame(engineIndex);
 }
 
 function clearDiv(divId){
